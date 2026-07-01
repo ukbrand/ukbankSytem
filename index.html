@@ -620,38 +620,6 @@ function ProfileScreen({ user }) {
   );
 }
 
-// ---------------- Bug Log tab (for QA reference inside the app) ----------------
-function BugLogScreen() {
-  return (
-    <div className="card">
-      <h2>Seeded Bug Log (20 bugs for manual testing practice)</h2>
-      <div className="bug-banner">
-        This tab is a QA reference only — it lists every bug intentionally built into this
-        application so you can log them in your test tracker (Jira/Excel/TestRail) as practice.
-      </div>
-      <table>
-        <thead>
-          <tr><th>#</th><th>Area</th><th>Bug description</th><th>Severity</th></tr>
-        </thead>
-        <tbody>
-          {BUG_LIST.map((b) => (
-            <tr key={b.id}>
-              <td>{b.id}</td>
-              <td>{b.area}</td>
-              <td>{b.title}</td>
-              <td>
-                <span className={"pill " + (b.severity === "Critical" || b.severity === "High" ? "pill-failed" : b.severity === "Medium" ? "pill-pending" : "pill-success")}>
-                  {b.severity}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 // ---------------- App Shell ----------------
 function AppShell({ onLogout }) {
   const [tab, setTab] = useState("dashboard");
@@ -668,7 +636,6 @@ function AppShell({ onLogout }) {
     { id: "transfer", label: "Transfer Funds" },
     { id: "billpay", label: "Pay Bills" },
     { id: "profile", label: "Profile" },
-    { id: "bugs", label: "Bug Log" },
   ];
 
   return (
@@ -705,7 +672,6 @@ function AppShell({ onLogout }) {
         {tab === "transfer" && <TransferScreen accounts={accounts} setAccounts={setAccounts} addTransaction={addTransaction} />}
         {tab === "billpay" && <PayBillsScreen accounts={accounts} setAccounts={setAccounts} />}
         {tab === "profile" && <ProfileScreen user={DEFAULT_USER} />}
-        {tab === "bugs" && <BugLogScreen />}
       </div>
 
       <div className="footer-note">UB Bank Manual Testing Sandbox &mdash; for QA training and practice only. Not a real bank.</div>
