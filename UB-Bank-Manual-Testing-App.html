@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UB Bank - Online Banking</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root{
+    --ub-navy:#0B2545;
+    --ub-navy-dark:#08192F;
+    --ub-gold:#C89B3C;
+    --ub-gold-light:#E4C877;
+    --ub-bg:#F4F6F9;
+    --ub-card:#FFFFFF;
+    --ub-border:#DEE3EA;
+    --ub-text:#132339;
+    --ub-text-muted:#5B6B82;
+    --ub-green:#1E8E5A;
+    --ub-red:#C4433C;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:var(--ub-bg);
+    color:var(--ub-text);
+  }
+  .ub-app{min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ---------- Login screen ---------- */
+  .login-wrap{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--ub-navy) 0%,var(--ub-navy-dark) 100%);
+    padding:24px;
+  }
+  .login-card{
+    background:var(--ub-card);
+    width:100%;max-width:380px;
+    border-radius:14px;
+    padding:36px 32px 28px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;}
+  .brand-mark{
+    width:40px;height:40px;border-radius:8px;
+    background:var(--ub-navy);
+    color:var(--ub-gold-light);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:18px;
+  }
+  .brand-name{font-size:20px;font-weight:700;color:var(--ub-navy);letter-spacing:0.5px;}
+  .brand-sub{text-align:center;color:var(--ub-text-muted);font-size:13px;margin-bottom:26px;}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--ub-text);}
+  input[type=text],input[type=password],input[type=number],select{
+    width:100%;padding:11px 12px;border:1px solid var(--ub-border);
+    border-radius:8px;font-size:14px;margin-bottom:16px;background:#fff;color:var(--ub-text);
+  }
+  input:focus,select:focus{outline:2px solid var(--ub-gold);border-color:var(--ub-gold);}
+  .btn{
+    width:100%;padding:12px;border:none;border-radius:8px;
+    background:var(--ub-navy);color:#fff;font-size:15px;font-weight:600;
+    cursor:pointer;transition:background .15s;
+  }
+  .btn:hover{background:var(--ub-navy-dark);}
+  .btn-gold{background:var(--ub-gold);color:var(--ub-navy-dark);}
+  .btn-gold:hover{background:var(--ub-gold-light);}
+  .btn-outline{background:#fff;border:1px solid var(--ub-border);color:var(--ub-text);}
+  .btn-danger{background:var(--ub-red);color:#fff;}
+  .error-msg{
+    background:#FDEDEC;color:var(--ub-red);border:1px solid #F5C6C3;
+    padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;
+  }
+  .success-msg{
+    background:#E8F6EE;color:var(--ub-green);border:1px solid #BFE6D0;
+    padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;
+  }
+  .hint-box{
+    margin-top:18px;background:#F4F6F9;border:1px dashed var(--ub-border);
+    border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ub-text-muted);
+    text-align:center;
+  }
+  .remember-row{display:flex;align-items:center;gap:8px;margin:-6px 0 16px;font-size:13px;color:var(--ub-text-muted);}
+
+  /* ---------- App shell ---------- */
+  .topbar{
+    background:var(--ub-navy);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;
+  }
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .topbar .brand-name{color:#fff;}
+  .topbar .brand-mark{background:var(--ub-gold);color:var(--ub-navy-dark);}
+  .nav{display:flex;gap:4px;padding:0 26px;background:#fff;border-bottom:1px solid var(--ub-border);}
+  .nav button{
+    background:none;border:none;padding:14px 18px;font-size:14px;font-weight:600;
+    color:var(--ub-text-muted);cursor:pointer;border-bottom:3px solid transparent;
+  }
+  .nav button.active{color:var(--ub-navy);border-bottom-color:var(--ub-gold);}
+  .main{flex:1;padding:26px;max-width:1000px;width:100%;margin:0 auto;}
+  .card{background:var(--ub-card);border:1px solid var(--ub-border);border-radius:var(--radius);padding:22px;margin-bottom:20px;}
+  .card h2{margin:0 0 16px;font-size:17px;color:var(--ub-navy);}
+  .balance-hero{
+    background:linear-gradient(135deg,var(--ub-navy) 0%,var(--ub-navy-dark) 100%);
+    color:#fff;border-radius:14px;padding:26px;margin-bottom:20px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+  }
+  .balance-hero .label{font-size:13px;opacity:0.75;margin-bottom:6px;}
+  .balance-hero .amount{font-size:34px;font-weight:700;color:var(--ub-gold-light);}
+  .acct-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;}
+  .acct-card{background:#fff;border:1px solid var(--ub-border);border-radius:10px;padding:16px;}
+  .acct-card .type{font-size:12px;color:var(--ub-text-muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .acct-card .num{font-size:13px;color:var(--ub-text-muted);margin:4px 0 10px;}
+  .acct-card .bal{font-size:20px;font-weight:700;color:var(--ub-navy);}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;padding:10px 8px;color:var(--ub-text-muted);border-bottom:1px solid var(--ub-border);font-weight:600;font-size:12px;text-transform:uppercase;}
+  td{padding:11px 8px;border-bottom:1px solid #EEF1F5;}
+  .amt-credit{color:var(--ub-green);font-weight:600;}
+  .amt-debit{color:var(--ub-red);font-weight:600;}
+  .pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+  .pill-success{background:#E8F6EE;color:var(--ub-green);}
+  .pill-pending{background:#FFF6E5;color:#B9860A;}
+  .pill-failed{background:#FDEDEC;color:var(--ub-red);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .footer-note{text-align:center;color:var(--ub-text-muted);font-size:12px;padding:16px;}
+  .bug-banner{
+    background:#FFF6E5;border:1px solid #F0D896;color:#8A6116;
+    padding:10px 14px;border-radius:8px;font-size:12.5px;margin-bottom:18px;
+  }
+  .userbadge{display:flex;align-items:center;gap:10px;}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--ub-gold);color:var(--ub-navy-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .small-link{background:none;border:none;color:var(--ub-navy);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+/* =========================================================
+   UB BANK — Manual Testing Practice Application
+   This app intentionally contains 20 bugs for QA training.
+   Default login:
+      Username: umesh
+      Password: sakshi123@
+   See the "Bug Log" tab inside the app (or BUG_LIST below)
+   for the full list of seeded defects and where to find them.
+========================================================= */
+
+const DEFAULT_USER = { username: "umesh", password: "sakshi123@", fullName: "Umesh Patil", email: "umesh.patil@ubbank.com" };
+
+// ---- Seed data ----
+const initialAccounts = [
+  { id: "acc1", type: "Savings", number: "XXXX-XXXX-4521", balance: 125430.50 },
+  { id: "acc2", type: "Current", number: "XXXX-XXXX-7788", balance: 48200.00 },
+  { id: "acc3", type: "Fixed Deposit", number: "XXXX-XXXX-1190", balance: 300000.00 },
+];
+
+const initialTransactions = [
+  { id: "t1", date: "2026-06-28", desc: "Salary Credit - TCS Ltd", amount: 65000, type: "credit", status: "Success", account: "acc1" },
+  { id: "t2", date: "2026-06-27", desc: "Electricity Bill Payment", amount: 2340, type: "debit", status: "Success", account: "acc1" },
+  { id: "t3", date: "2026-06-25", desc: "Transfer to Sakshi Sharma", amount: 5000, type: "debit", status: "Success", account: "acc1" },
+  { id: "t4", date: "2026-06-22", desc: "ATM Withdrawal", amount: 10000, type: "debit", status: "Success", account: "acc1" },
+  { id: "t5", date: "2026-06-20", desc: "Interest Credit", amount: 890.25, type: "credit", status: "Success", account: "acc3" },
+  { id: "t6", date: "2026-06-18", desc: "Online Purchase - Amazon", amount: 3499, type: "debit", status: "Pending", account: "acc2" },
+];
+
+const BUG_LIST = [
+  { id: 1, area: "Login", title: "Password field is type=text on first render, briefly shows password", severity: "Medium" },
+  { id: 2, area: "Login", title: "Login button stays enabled during loading, allows duplicate submits", severity: "Medium" },
+  { id: 3, area: "Login", title: "Wrong-password error message says 'username' instead of 'password'", severity: "Low" },
+  { id: 4, area: "Login", title: "'Remember me' checkbox has no effect (not wired to state)", severity: "Low" },
+  { id: 5, area: "Dashboard", title: "Total balance sums accounts but skips Fixed Deposit account in the calculation", severity: "High" },
+  { id: 6, area: "Dashboard", title: "Welcome message shows username in lowercase always, ignoring actual case", severity: "Low" },
+  { id: 7, area: "Transactions", title: "Transactions are not sorted by date (insertion order shown as-is even after 'sort by date' claim)", severity: "Medium" },
+  { id: 8, area: "Transactions", title: "Filter by 'Credit' also shows Pending debit transactions", severity: "Medium" },
+  { id: 9, area: "Transactions", title: "Search box is case-sensitive (searching 'salary' finds nothing, 'Salary' works)", severity: "Medium" },
+  { id: 10, area: "Transfer Funds", title: "Transfer allows negative amount to be entered and submitted", severity: "High" },
+  { id: 11, area: "Transfer Funds", title: "Transfer allows amount greater than available balance (no validation)", severity: "Critical" },
+  { id: 12, area: "Transfer Funds", title: "Successful transfer deducts amount from source but does NOT add a transaction record", severity: "High" },
+  { id: 13, area: "Transfer Funds", title: "Transfer confirmation shows wrong recipient account number (off-by-one from dropdown)", severity: "Medium" },
+  { id: 14, area: "Transfer Funds", title: "Clicking 'Transfer' twice quickly submits the transfer twice (double debit)", severity: "Critical" },
+  { id: 15, area: "Pay Bills", title: "Pay Bills 'Amount' field accepts letters, resulting in NaN deducted from balance", severity: "High" },
+  { id: 16, area: "Pay Bills", title: "Bill payment success message appears even when payment fails validation", severity: "Medium" },
+  { id: 17, area: "Profile", title: "Editing profile 'Save' button does not actually persist changes after page revisit", severity: "Medium" },
+  { id: 18, area: "Profile", title: "Email field has no format validation, accepts any string", severity: "Low" },
+  { id: 19, area: "Navigation", title: "Logout does not clear session state; back navigation via tab still shows dashboard briefly", severity: "Medium" },
+  { id: 20, area: "General", title: "Currency amounts sometimes render extra decimal digits due to floating point math (e.g. 48200.00 + 0.1)", severity: "Low" },
+];
+
+function formatCurrency(n) {
+  // BUG #20: no rounding/toFixed applied consistently -> floating point artifacts can leak through
+  return "₹" + n.toLocaleString("en-IN");
+}
+
+// ---------------- Login Screen ----------------
+function LoginScreen({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false); // BUG #4: never used anywhere
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(true); // BUG #1: defaults to true so password shows briefly as text
+
+  useEffect(() => {
+    // "fixes" itself after first paint, but the initial render already exposed it
+    const t = setTimeout(() => setShowPassword(false), 400);
+    return () => clearTimeout(t);
+  }, []);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true); // BUG #2: button is not actually disabled while loading, see render below
+    setTimeout(() => {
+      if (username === DEFAULT_USER.username && password === DEFAULT_USER.password) {
+        setLoading(false);
+        onLogin();
+      } else if (username !== DEFAULT_USER.username) {
+        setLoading(false);
+        setError("Invalid username. Please try again.");
+      } else {
+        setLoading(false);
+        // BUG #3: message wording is wrong - says username but it's actually the password that's wrong
+        setError("Invalid username. Please check and try again.");
+      }
+    }, 600);
+  }
+
+  return (
+    <div className="login-wrap">
+      <div className="login-card">
+        <div className="brand">
+          <div className="brand-mark">UB</div>
+          <div className="brand-name">UB BANK</div>
+        </div>
+        <div className="brand-sub">Union Bharat Bank &mdash; Online Banking</div>
+
+        {error && <div className="error-msg">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
+          />
+
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <div className="remember-row">
+            <input
+              type="checkbox"
+              id="remember"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              style={{ width: "auto", margin: 0 }}
+            />
+            <label htmlFor="remember" style={{ margin: 0, fontWeight: 400 }}>Remember me on this device</label>
+          </div>
+
+          {/* BUG #2: button never gets disabled={loading}, so users can double/triple click */}
+          <button type="submit" className="btn">
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+
+        <div className="hint-box">
+          Default test credentials<br />
+          Username: <strong>umesh</strong> &nbsp;|&nbsp; Password: <strong>sakshi123@</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Dashboard ----------------
+function Dashboard({ accounts, transactions }) {
+  // BUG #5: total balance calculation skips Fixed Deposit type accounts
+  const totalBalance = useMemo(() => {
+    return accounts
+      .filter((a) => a.type !== "Fixed Deposit")
+      .reduce((sum, a) => sum + a.balance, 0);
+  }, [accounts]);
+
+  const recent = transactions.slice(0, 5);
+
+  return (
+    <div>
+      <div className="balance-hero">
+        <div>
+          <div className="label">Total Available Balance</div>
+          <div className="amount">{formatCurrency(totalBalance)}</div>
+        </div>
+        <div style={{ fontSize: 13, opacity: 0.8 }}>
+          As of {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+        </div>
+      </div>
+
+      <div className="acct-grid">
+        {accounts.map((a) => (
+          <div className="acct-card" key={a.id}>
+            <div className="type">{a.type} Account</div>
+            <div className="num">{a.number}</div>
+            <div className="bal">{formatCurrency(a.balance)}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <h2>Recent Transactions</h2>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Status</th><th style={{textAlign:"right"}}>Amount</th></tr>
+          </thead>
+          <tbody>
+            {recent.map((t) => (
+              <tr key={t.id}>
+                <td>{t.date}</td>
+                <td>{t.desc}</td>
+                <td>
+                  <span className={"pill " + (t.status === "Success" ? "pill-success" : t.status === "Pending" ? "pill-pending" : "pill-failed")}>
+                    {t.status}
+                  </span>
+                </td>
+                <td style={{ textAlign: "right" }} className={t.type === "credit" ? "amt-credit" : "amt-debit"}>
+                  {t.type === "credit" ? "+ " : "- "}{formatCurrency(t.amount)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Transactions ----------------
+function TransactionsScreen({ transactions }) {
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+
+  // BUG #9: search is case-sensitive because no .toLowerCase() normalization
+  // BUG #7: "sort by date" toggle exists but doesn't actually change order
+  const [sortByDate, setSortByDate] = useState(false);
+
+  const filtered = transactions.filter((t) => {
+    const matchesSearch = t.desc.includes(search); // case-sensitive on purpose (bug)
+    // BUG #8: "Credit" filter also lets Pending items through regardless of type
+    const matchesFilter =
+      filter === "All" ||
+      (filter === "Credit" && (t.type === "credit" || t.status === "Pending")) ||
+      (filter === "Debit" && t.type === "debit" && t.status !== "Pending");
+    return matchesSearch && matchesFilter;
+  });
+
+  // sortByDate is toggled but never actually applied to `filtered` -> bug
+  const displayed = filtered;
+
+  return (
+    <div className="card">
+      <h2>All Transactions</h2>
+      <div className="form-row" style={{ marginBottom: 16 }}>
+        <div>
+          <label>Search description</label>
+          <input
+            type="text"
+            placeholder="e.g. Salary (try lowercase vs capitalized)"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Filter</label>
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option>All</option>
+            <option>Credit</option>
+            <option>Debit</option>
+          </select>
+        </div>
+      </div>
+      <button className="small-link" onClick={() => setSortByDate(!sortByDate)}>
+        {sortByDate ? "Sorted by date (newest first)" : "Sort by date"}
+      </button>
+      <div style={{ height: 12 }} />
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Description</th><th>Account</th><th>Status</th><th style={{textAlign:"right"}}>Amount</th></tr>
+        </thead>
+        <tbody>
+          {displayed.map((t) => (
+            <tr key={t.id}>
+              <td>{t.date}</td>
+              <td>{t.desc}</td>
+              <td>{t.account}</td>
+              <td>
+                <span className={"pill " + (t.status === "Success" ? "pill-success" : t.status === "Pending" ? "pill-pending" : "pill-failed")}>
+                  {t.status}
+                </span>
+              </td>
+              <td style={{ textAlign: "right" }} className={t.type === "credit" ? "amt-credit" : "amt-debit"}>
+                {t.type === "credit" ? "+ " : "- "}{formatCurrency(t.amount)}
+              </td>
+            </tr>
+          ))}
+          {displayed.length === 0 && (
+            <tr><td colSpan="5" style={{ textAlign: "center", color: "var(--ub-text-muted)", padding: 20 }}>No transactions found.</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ---------------- Transfer Funds ----------------
+function TransferScreen({ accounts, setAccounts, addTransaction }) {
+  const [fromAcc, setFromAcc] = useState(accounts[0]?.id || "");
+  const [toAcc, setToAcc] = useState("Sakshi Sharma - XXXX-XXXX-2201");
+  const [amount, setAmount] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [message, setMessage] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const recipients = [
+    "Sakshi Sharma - XXXX-XXXX-2201",
+    "Rahul Verma - XXXX-XXXX-3390",
+    "Priya Deshmukh - XXXX-XXXX-5567",
+  ];
+
+  function handleTransfer(e) {
+    e.preventDefault();
+    // BUG #11: no check that amount <= account balance
+    // BUG #10: no check that amount > 0 (negative numbers silently accepted)
+    const amt = parseFloat(amount);
+
+    // BUG #14: no submitting guard actually blocks a second click because
+    // setSubmitting(true) happens AFTER the balance mutation below, not before.
+    const acc = accounts.find((a) => a.id === fromAcc);
+    if (!acc) return;
+
+    const updated = accounts.map((a) =>
+      a.id === fromAcc ? { ...a, balance: a.balance - amt } : a
+    );
+    setAccounts(updated);
+    setSubmitting(true);
+
+    // BUG #13: shows recipients[index] using toAcc's position incorrectly (off-by-one)
+    const idx = recipients.indexOf(toAcc);
+    const shownRecipient = recipients[idx + 1] || recipients[idx];
+
+    // BUG #12: transaction record is never added to the transactions list
+    // (addTransaction is intentionally not called here)
+
+    setMessage({
+      type: "success",
+      text: `Transfer of ${formatCurrency(amt || 0)} to ${shownRecipient} was successful.`,
+    });
+    setSubmitting(false);
+    setAmount("");
+    setRemarks("");
+  }
+
+  return (
+    <div className="card">
+      <h2>Transfer Funds</h2>
+      {message && <div className={message.type === "success" ? "success-msg" : "error-msg"}>{message.text}</div>}
+      <form onSubmit={handleTransfer}>
+        <div className="form-row">
+          <div>
+            <label>From Account</label>
+            <select value={fromAcc} onChange={(e) => setFromAcc(e.target.value)}>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>{a.type} - {a.number} ({formatCurrency(a.balance)})</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label>To Recipient</label>
+            <select value={toAcc} onChange={(e) => setToAcc(e.target.value)}>
+              {recipients.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="form-row">
+          <div>
+            <label>Amount (₹)</label>
+            <input
+              type="number"
+              placeholder="Enter amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Remarks (optional)</label>
+            <input
+              type="text"
+              placeholder="e.g. Rent, Loan repayment"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+            />
+          </div>
+        </div>
+        <button type="submit" className="btn btn-gold">Transfer Now</button>
+      </form>
+    </div>
+  );
+}
+
+// ---------------- Pay Bills ----------------
+function PayBillsScreen({ accounts, setAccounts }) {
+  const [biller, setBiller] = useState("Electricity Board");
+  const [accId, setAccId] = useState(accounts[0]?.id || "");
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState(null);
+
+  function handlePay(e) {
+    e.preventDefault();
+    // BUG #15: amount field has no numeric validation, "abc" becomes NaN
+    const amt = parseFloat(amount);
+
+    const updated = accounts.map((a) =>
+      a.id === accId ? { ...a, balance: a.balance - amt } : a
+    );
+    setAccounts(updated);
+
+    // BUG #16: success message shows regardless of whether amt is NaN or invalid
+    setMessage({ type: "success", text: `Payment of ₹${amount} to ${biller} was successful.` });
+    setAmount("");
+  }
+
+  return (
+    <div className="card">
+      <h2>Pay Bills</h2>
+      {message && <div className="success-msg">{message.text}</div>}
+      <form onSubmit={handlePay}>
+        <div className="form-row">
+          <div>
+            <label>Biller</label>
+            <select value={biller} onChange={(e) => setBiller(e.target.value)}>
+              <option>Electricity Board</option>
+              <option>Water Supply Dept</option>
+              <option>Broadband - Jio Fiber</option>
+              <option>Mobile Postpaid</option>
+            </select>
+          </div>
+          <div>
+            <label>Pay From</label>
+            <select value={accId} onChange={(e) => setAccId(e.target.value)}>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>{a.type} - {a.number}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <label>Amount (₹)</label>
+        {/* BUG #15: type="text" instead of type="number", so letters are allowed */}
+        <input
+          type="text"
+          placeholder="Enter amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button type="submit" className="btn btn-gold" style={{ marginTop: 4 }}>Pay Now</button>
+      </form>
+    </div>
+  );
+}
+
+// ---------------- Profile ----------------
+function ProfileScreen({ user }) {
+  const [fullName, setFullName] = useState(user.fullName);
+  const [email, setEmail] = useState(user.email);
+  const [phone, setPhone] = useState("+91 98765 43210");
+  const [saved, setSaved] = useState(false);
+
+  function handleSave(e) {
+    e.preventDefault();
+    // BUG #17: values are only kept in local component state, never written back
+    // to any shared/user store or persisted -> "changes" vanish on tab switch.
+    // BUG #18: no email format validation at all before "saving"
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  }
+
+  return (
+    <div className="card">
+      <h2>Profile Settings</h2>
+      {saved && <div className="success-msg">Profile updated.</div>}
+      <form onSubmit={handleSave}>
+        <div className="form-row">
+          <div>
+            <label>Full Name</label>
+            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          </div>
+          <div>
+            <label>Email Address</label>
+            <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+        </div>
+        <label>Phone Number</label>
+        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <button type="submit" className="btn btn-outline">Save Changes</button>
+      </form>
+    </div>
+  );
+}
+
+// ---------------- Bug Log tab (for QA reference inside the app) ----------------
+function BugLogScreen() {
+  return (
+    <div className="card">
+      <h2>Seeded Bug Log (20 bugs for manual testing practice)</h2>
+      <div className="bug-banner">
+        This tab is a QA reference only — it lists every bug intentionally built into this
+        application so you can log them in your test tracker (Jira/Excel/TestRail) as practice.
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Area</th><th>Bug description</th><th>Severity</th></tr>
+        </thead>
+        <tbody>
+          {BUG_LIST.map((b) => (
+            <tr key={b.id}>
+              <td>{b.id}</td>
+              <td>{b.area}</td>
+              <td>{b.title}</td>
+              <td>
+                <span className={"pill " + (b.severity === "Critical" || b.severity === "High" ? "pill-failed" : b.severity === "Medium" ? "pill-pending" : "pill-success")}>
+                  {b.severity}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ---------------- App Shell ----------------
+function AppShell({ onLogout }) {
+  const [tab, setTab] = useState("dashboard");
+  const [accounts, setAccounts] = useState(initialAccounts);
+  const [transactions, setTransactions] = useState(initialTransactions);
+
+  function addTransaction(tx) {
+    setTransactions((prev) => [tx, ...prev]);
+  }
+
+  const tabs = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "transactions", label: "Transactions" },
+    { id: "transfer", label: "Transfer Funds" },
+    { id: "billpay", label: "Pay Bills" },
+    { id: "profile", label: "Profile" },
+    { id: "bugs", label: "Bug Log" },
+  ];
+
+  return (
+    <div className="ub-app">
+      <div className="topbar">
+        <div className="topbar-left">
+          <div className="brand-mark">UB</div>
+          <div className="brand-name">UB BANK</div>
+        </div>
+        <div className="userbadge">
+          <div className="avatar">UP</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>{DEFAULT_USER.fullName}</div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Customer ID: UB2026458</div>
+          </div>
+          {/* BUG #19: onLogout does not clear any session-level state, dashboard data persists in memory */}
+          <button className="btn-outline" style={{ padding: "8px 14px", fontSize: 13, marginLeft: 14, width: "auto" }} onClick={onLogout}>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div className="nav">
+        {tabs.map((t) => (
+          <button key={t.id} className={tab === t.id ? "active" : ""} onClick={() => setTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="main">
+        {tab === "dashboard" && <Dashboard accounts={accounts} transactions={transactions} />}
+        {tab === "transactions" && <TransactionsScreen transactions={transactions} />}
+        {tab === "transfer" && <TransferScreen accounts={accounts} setAccounts={setAccounts} addTransaction={addTransaction} />}
+        {tab === "billpay" && <PayBillsScreen accounts={accounts} setAccounts={setAccounts} />}
+        {tab === "profile" && <ProfileScreen user={DEFAULT_USER} />}
+        {tab === "bugs" && <BugLogScreen />}
+      </div>
+
+      <div className="footer-note">UB Bank Manual Testing Sandbox &mdash; for QA training and practice only. Not a real bank.</div>
+    </div>
+  );
+}
+
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  return loggedIn ? <AppShell onLogout={() => setLoggedIn(false)} /> : <LoginScreen onLogin={() => setLoggedIn(true)} />;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
