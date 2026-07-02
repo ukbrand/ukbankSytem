@@ -1,690 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>UB Bank - Online Banking</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<meta charset="UTF-8">
+<title>SecureBank Online</title>
 <style>
-  :root{
-    --ub-navy:#0B2545;
-    --ub-navy-dark:#08192F;
-    --ub-gold:#C89B3C;
-    --ub-gold-light:#E4C877;
-    --ub-bg:#F4F6F9;
-    --ub-card:#FFFFFF;
-    --ub-border:#DEE3EA;
-    --ub-text:#132339;
-    --ub-text-muted:#5B6B82;
-    --ub-green:#1E8E5A;
-    --ub-red:#C4433C;
-    --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    background:var(--ub-bg);
-    color:var(--ub-text);
-  }
-  .ub-app{min-height:100vh;display:flex;flex-direction:column;}
-
-  /* ---------- Login screen ---------- */
-  .login-wrap{
-    flex:1;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,var(--ub-navy) 0%,var(--ub-navy-dark) 100%);
-    padding:24px;
-  }
-  .login-card{
-    background:var(--ub-card);
-    width:100%;max-width:380px;
-    border-radius:14px;
-    padding:36px 32px 28px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.35);
-  }
-  .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;}
-  .brand-mark{
-    width:40px;height:40px;border-radius:8px;
-    background:var(--ub-navy);
-    color:var(--ub-gold-light);
-    display:flex;align-items:center;justify-content:center;
-    font-weight:700;font-size:18px;
-  }
-  .brand-name{font-size:20px;font-weight:700;color:var(--ub-navy);letter-spacing:0.5px;}
-  .brand-sub{text-align:center;color:var(--ub-text-muted);font-size:13px;margin-bottom:26px;}
-  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--ub-text);}
-  input[type=text],input[type=password],input[type=number],select{
-    width:100%;padding:11px 12px;border:1px solid var(--ub-border);
-    border-radius:8px;font-size:14px;margin-bottom:16px;background:#fff;color:var(--ub-text);
-  }
-  input:focus,select:focus{outline:2px solid var(--ub-gold);border-color:var(--ub-gold);}
-  .btn{
-    width:100%;padding:12px;border:none;border-radius:8px;
-    background:var(--ub-navy);color:#fff;font-size:15px;font-weight:600;
-    cursor:pointer;transition:background .15s;
-  }
-  .btn:hover{background:var(--ub-navy-dark);}
-  .btn-gold{background:var(--ub-gold);color:var(--ub-navy-dark);}
-  .btn-gold:hover{background:var(--ub-gold-light);}
-  .btn-outline{background:#fff;border:1px solid var(--ub-border);color:var(--ub-text);}
-  .btn-danger{background:var(--ub-red);color:#fff;}
-  .error-msg{
-    background:#FDEDEC;color:var(--ub-red);border:1px solid #F5C6C3;
-    padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;
-  }
-  .success-msg{
-    background:#E8F6EE;color:var(--ub-green);border:1px solid #BFE6D0;
-    padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;
-  }
-  .hint-box{
-    margin-top:18px;background:#F4F6F9;border:1px dashed var(--ub-border);
-    border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ub-text-muted);
-    text-align:center;
-  }
-  .remember-row{display:flex;align-items:center;gap:8px;margin:-6px 0 16px;font-size:13px;color:var(--ub-text-muted);}
-
-  /* ---------- App shell ---------- */
-  .topbar{
-    background:var(--ub-navy);color:#fff;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 26px;
-  }
-  .topbar-left{display:flex;align-items:center;gap:12px;}
-  .topbar .brand-name{color:#fff;}
-  .topbar .brand-mark{background:var(--ub-gold);color:var(--ub-navy-dark);}
-  .nav{display:flex;gap:4px;padding:0 26px;background:#fff;border-bottom:1px solid var(--ub-border);}
-  .nav button{
-    background:none;border:none;padding:14px 18px;font-size:14px;font-weight:600;
-    color:var(--ub-text-muted);cursor:pointer;border-bottom:3px solid transparent;
-  }
-  .nav button.active{color:var(--ub-navy);border-bottom-color:var(--ub-gold);}
-  .main{flex:1;padding:26px;max-width:1000px;width:100%;margin:0 auto;}
-  .card{background:var(--ub-card);border:1px solid var(--ub-border);border-radius:var(--radius);padding:22px;margin-bottom:20px;}
-  .card h2{margin:0 0 16px;font-size:17px;color:var(--ub-navy);}
-  .balance-hero{
-    background:linear-gradient(135deg,var(--ub-navy) 0%,var(--ub-navy-dark) 100%);
-    color:#fff;border-radius:14px;padding:26px;margin-bottom:20px;
-    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
-  }
-  .balance-hero .label{font-size:13px;opacity:0.75;margin-bottom:6px;}
-  .balance-hero .amount{font-size:34px;font-weight:700;color:var(--ub-gold-light);}
-  .acct-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;}
-  .acct-card{background:#fff;border:1px solid var(--ub-border);border-radius:10px;padding:16px;}
-  .acct-card .type{font-size:12px;color:var(--ub-text-muted);text-transform:uppercase;letter-spacing:0.5px;}
-  .acct-card .num{font-size:13px;color:var(--ub-text-muted);margin:4px 0 10px;}
-  .acct-card .bal{font-size:20px;font-weight:700;color:var(--ub-navy);}
-  table{width:100%;border-collapse:collapse;font-size:13.5px;}
-  th{text-align:left;padding:10px 8px;color:var(--ub-text-muted);border-bottom:1px solid var(--ub-border);font-weight:600;font-size:12px;text-transform:uppercase;}
-  td{padding:11px 8px;border-bottom:1px solid #EEF1F5;}
-  .amt-credit{color:var(--ub-green);font-weight:600;}
-  .amt-debit{color:var(--ub-red);font-weight:600;}
-  .pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-  .pill-success{background:#E8F6EE;color:var(--ub-green);}
-  .pill-pending{background:#FFF6E5;color:#B9860A;}
-  .pill-failed{background:#FDEDEC;color:var(--ub-red);}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .footer-note{text-align:center;color:var(--ub-text-muted);font-size:12px;padding:16px;}
-  .bug-banner{
-    background:#FFF6E5;border:1px solid #F0D896;color:#8A6116;
-    padding:10px 14px;border-radius:8px;font-size:12.5px;margin-bottom:18px;
-  }
-  .userbadge{display:flex;align-items:center;gap:10px;}
-  .avatar{width:34px;height:34px;border-radius:50%;background:var(--ub-gold);color:var(--ub-navy-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
-  .small-link{background:none;border:none;color:var(--ub-navy);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;}
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #eef1f6; color: #1c2b3a; }
+  .navbar { background: #0b3d62; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+  .navbar .brand { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
+  .navbar nav a { color: #cfe0f0; margin-left: 18px; text-decoration: none; font-size: 14px; cursor: pointer; }
+  .navbar nav a:hover { color: #fff; }
+  .container { max-width: 960px; margin: 30px auto; padding: 0 16px; }
+  .card { background: #fff; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  h2 { margin-bottom: 14px; color: #0b3d62; }
+  .balance-card { background: linear-gradient(135deg,#0b3d62,#12558a); color: #fff; }
+  .balance-card .amount { font-size: 34px; font-weight: 700; margin-top: 6px; }
+  .balance-card .label { font-size: 13px; opacity: .8; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+  .action-btn { background: #f3f6fa; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; font-size: 13px; color:#0b3d62; }
+  .action-btn:hover { background: #e4ecf5; }
+  label { display: block; font-size: 13px; margin: 10px 0 4px; color: #40536b; }
+  input, select { width: 100%; padding: 9px 10px; border: 1px solid #ccd6e0; border-radius: 6px; font-size: 14px; }
+  button.primary { margin-top: 16px; background: #0b3d62; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  button.primary:hover { background: #0b3d62; }
+  .msg { padding: 10px 12px; border-radius: 6px; margin-top: 12px; font-size: 13px; display:none; }
+  .msg.show { display:block; }
+  .msg.success { background: #eafff0; color: #eafff0; }
+  .msg.error { background: #ffecec; color: #b21f2d; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { text-align: left; padding: 9px 8px; font-size: 13px; border-bottom: 1px solid #e6ebf1; }
+  th { color: #6d7f93; font-weight: 600; }
+  .amt-credit { color: #1a8f4c; }
+  .amt-debit { color: #c0392b; }
+  .hidden { display: none; }
+  .login-wrap { max-width: 380px; margin: 90px auto; }
+  .footer { text-align:center; font-size:12px; color:#8a97a5; margin: 30px 0; }
+  .pagination { margin-top: 10px; font-size: 13px; }
+  .pagination span { margin-right: 10px; cursor: pointer; color: #0b3d62; }
+  .beneficiary-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:13px; }
 </style>
 </head>
 <body>
-<div id="root"></div>
 
-<script type="text/babel">
-const { useState, useEffect, useMemo } = React;
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="card">
+    <h2>SecureBank Login</h2>
+    <label for="loginUser">Username</label>
+    <input id="loginUser" type="text" placeholder="Username">
+    <label for="loginPass">Password</label>
+    <input id="loginPass" type="text" placeholder="password">
+    <button class="primary" onclick="login()">Login</button>
+    <div id="loginMsg" class="msg error"></div>
+    <p style="font-size:12px;margin-top:14px;color:#8a97a5;">Demo credentials — username: <b>admin</b>, password: <b>admin123</b></p>
+  </div>
+</div>
 
-/* =========================================================
-   UB BANK — Manual Testing Practice Application
-   This app intentionally contains 20 bugs for QA training.
-   Default login:
-      Username: umesh
-      Password: sakshi123@
-   See the "Bug Log" tab inside the app (or BUG_LIST below)
-   for the full list of seeded defects and where to find them.
-========================================================= */
+<!-- MAIN APP -->
+<div id="appScreen" class="hidden">
+  <div class="navbar">
+    <div class="brand">SecureBank Online</div>
+    <nav>
+      <a onclick="showPage('dashboard')">Dashboard</a>
+      <a onclick="showPage('transfer')">Transfer</a>
+      <a onclick="showPage('deposit')">Deposit / Withdraw</a>
+      <a onclick="showPage('beneficiary')">Beneficiaries</a>
+      <a onclick="showPage('history')">Transactions</a>
+      <a onclick="showPage('profile')">Profile</a>
+      <a onclick="logout()">Logout</a>
+    </nav>
+  </div>
 
-const DEFAULT_USER = { username: "umesh", password: "sakshi123@", fullName: "Umesh Patil", email: "umesh.patil@ubbank.com" };
+  <div class="container">
 
-// ---- Seed data ----
-const initialAccounts = [
-  { id: "acc1", type: "Savings", number: "XXXX-XXXX-4521", balance: 125430.50 },
-  { id: "acc2", type: "Current", number: "XXXX-XXXX-7788", balance: 48200.00 },
-  { id: "acc3", type: "Fixed Deposit", number: "XXXX-XXXX-1190", balance: 300000.00 },
-];
-
-const initialTransactions = [
-  { id: "t1", date: "2026-06-28", desc: "Salary Credit - TCS Ltd", amount: 65000, type: "credit", status: "Success", account: "acc1" },
-  { id: "t2", date: "2026-06-27", desc: "Electricity Bill Payment", amount: 2340, type: "debit", status: "Success", account: "acc1" },
-  { id: "t3", date: "2026-06-25", desc: "Transfer to Sakshi Sharma", amount: 5000, type: "debit", status: "Success", account: "acc1" },
-  { id: "t4", date: "2026-06-22", desc: "ATM Withdrawal", amount: 10000, type: "debit", status: "Success", account: "acc1" },
-  { id: "t5", date: "2026-06-20", desc: "Interest Credit", amount: 890.25, type: "credit", status: "Success", account: "acc3" },
-  { id: "t6", date: "2026-06-18", desc: "Online Purchase - Amazon", amount: 3499, type: "debit", status: "Pending", account: "acc2" },
-];
-
-const BUG_LIST = [
-  { id: 1, area: "Login", title: "Password field is type=text on first render, briefly shows password", severity: "Medium" },
-  { id: 2, area: "Login", title: "Login button stays enabled during loading, allows duplicate submits", severity: "Medium" },
-  { id: 3, area: "Login", title: "Wrong-password error message says 'username' instead of 'password'", severity: "Low" },
-  { id: 4, area: "Login", title: "'Remember me' checkbox has no effect (not wired to state)", severity: "Low" },
-  { id: 5, area: "Dashboard", title: "Total balance sums accounts but skips Fixed Deposit account in the calculation", severity: "High" },
-  { id: 6, area: "Dashboard", title: "Welcome message shows username in lowercase always, ignoring actual case", severity: "Low" },
-  { id: 7, area: "Transactions", title: "Transactions are not sorted by date (insertion order shown as-is even after 'sort by date' claim)", severity: "Medium" },
-  { id: 8, area: "Transactions", title: "Filter by 'Credit' also shows Pending debit transactions", severity: "Medium" },
-  { id: 9, area: "Transactions", title: "Search box is case-sensitive (searching 'salary' finds nothing, 'Salary' works)", severity: "Medium" },
-  { id: 10, area: "Transfer Funds", title: "Transfer allows negative amount to be entered and submitted", severity: "High" },
-  { id: 11, area: "Transfer Funds", title: "Transfer allows amount greater than available balance (no validation)", severity: "Critical" },
-  { id: 12, area: "Transfer Funds", title: "Successful transfer deducts amount from source but does NOT add a transaction record", severity: "High" },
-  { id: 13, area: "Transfer Funds", title: "Transfer confirmation shows wrong recipient account number (off-by-one from dropdown)", severity: "Medium" },
-  { id: 14, area: "Transfer Funds", title: "Clicking 'Transfer' twice quickly submits the transfer twice (double debit)", severity: "Critical" },
-  { id: 15, area: "Pay Bills", title: "Pay Bills 'Amount' field accepts letters, resulting in NaN deducted from balance", severity: "High" },
-  { id: 16, area: "Pay Bills", title: "Bill payment success message appears even when payment fails validation", severity: "Medium" },
-  { id: 17, area: "Profile", title: "Editing profile 'Save' button does not actually persist changes after page revisit", severity: "Medium" },
-  { id: 18, area: "Profile", title: "Email field has no format validation, accepts any string", severity: "Low" },
-  { id: 19, area: "Navigation", title: "Logout does not clear session state; back navigation via tab still shows dashboard briefly", severity: "Medium" },
-  { id: 20, area: "General", title: "Currency amounts sometimes render extra decimal digits due to floating point math (e.g. 48200.00 + 0.1)", severity: "Low" },
-];
-
-function formatCurrency(n) {
-  // BUG #20: no rounding/toFixed applied consistently -> floating point artifacts can leak through
-  return "₹" + n.toLocaleString("en-IN");
-}
-
-// ---------------- Login Screen ----------------
-function LoginScreen({ onLogin }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false); // BUG #4: never used anywhere
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(true); // BUG #1: defaults to true so password shows briefly as text
-
-  useEffect(() => {
-    // "fixes" itself after first paint, but the initial render already exposed it
-    const t = setTimeout(() => setShowPassword(false), 400);
-    return () => clearTimeout(t);
-  }, []);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true); // BUG #2: button is not actually disabled while loading, see render below
-    setTimeout(() => {
-      if (username === DEFAULT_USER.username && password === DEFAULT_USER.password) {
-        setLoading(false);
-        onLogin();
-      } else if (username !== DEFAULT_USER.username) {
-        setLoading(false);
-        setError("Invalid username. Please try again.");
-      } else {
-        setLoading(false);
-        // BUG #3: message wording is wrong - says username but it's actually the password that's wrong
-        setError("Invalid username. Please check and try again.");
-      }
-    }, 600);
-  }
-
-  return (
-    <div className="login-wrap">
-      <div className="login-card">
-        <div className="brand">
-          <div className="brand-mark">UB</div>
-          <div className="brand-name">UB BANK</div>
-        </div>
-        <div className="brand-sub">Union Bharat Bank &mdash; Online Banking</div>
-
-        {error && <div className="error-msg">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoComplete="off"
-          />
-
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <div className="remember-row">
-            <input
-              type="checkbox"
-              id="remember"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-              style={{ width: "auto", margin: 0 }}
-            />
-            <label htmlFor="remember" style={{ margin: 0, fontWeight: 400 }}>Remember me on this device</label>
-          </div>
-
-          {/* BUG #2: button never gets disabled={loading}, so users can double/triple click */}
-          <button type="submit" className="btn">
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="hint-box">
-          Default test credentials<br />
-          Username: <strong>umesh</strong> &nbsp;|&nbsp; Password: <strong>sakshi123@</strong>
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+      <div class="card balance-card">
+        <div class="label">Available Balance</div>
+        <div class="amount" id="dashBalance">$0.00</div>
+      </div>
+      <div class="card">
+        <h2>Quick Actions</h2>
+        <div class="grid">
+          <div class="action-btn" onclick="showPage('transfer')">Transfer Money</div>
+          <div class="action-btn" onclick="showPage('deposit')">Deposit</div>
+          <div class="action-btn" onclick="showPage('deposit')">Withdraw</div>
+          <div class="action-btn" onclick="showPage('history')">View Transactions</div>
         </div>
       </div>
     </div>
-  );
-}
 
-// ---------------- Dashboard ----------------
-function Dashboard({ accounts, transactions }) {
-  // BUG #5: total balance calculation skips Fixed Deposit type accounts
-  const totalBalance = useMemo(() => {
-    return accounts
-      .filter((a) => a.type !== "Fixed Deposit")
-      .reduce((sum, a) => sum + a.balance, 0);
-  }, [accounts]);
-
-  const recent = transactions.slice(0, 5);
-
-  return (
-    <div>
-      <div className="balance-hero">
-        <div>
-          <div className="label">Total Available Balance</div>
-          <div className="amount">{formatCurrency(totalBalance)}</div>
-        </div>
-        <div style={{ fontSize: 13, opacity: 0.8 }}>
-          As of {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-        </div>
+    <!-- TRANSFER -->
+    <div id="page-transfer" class="page hidden">
+      <div class="card">
+        <h2>Transfer Money</h2>
+        <label for="transferTo">Beneficiary Account Number</label>
+        <input id="transferTo" type="text" placeholder="Account number">
+        <label for="transferAmt">Amount</label>
+        <input id="transferAmt" type="text" placeholder="Enter amount">
+        <label for="transferNote">Note (optional)</label>
+        <input id="transferNote" type="text" placeholder="Note">
+        <button class="primary" onclick="doTransfer()">Send Money</button>
+        <div id="transferMsg" class="msg"></div>
       </div>
+    </div>
 
-      <div className="acct-grid">
-        {accounts.map((a) => (
-          <div className="acct-card" key={a.id}>
-            <div className="type">{a.type} Account</div>
-            <div className="num">{a.number}</div>
-            <div className="bal">{formatCurrency(a.balance)}</div>
-          </div>
-        ))}
+    <!-- DEPOSIT / WITHDRAW -->
+    <div id="page-deposit" class="page hidden">
+      <div class="card">
+        <h2>Deposit Funds</h2>
+        <label for="depositAmt">Amount</label>
+        <input id="depositAmt" type="text" placeholder="Enter amount">
+        <button class="primary" onclick="doDeposit()">Deposit</button>
+        <div id="depositMsg" class="msg"></div>
       </div>
+      <div class="card">
+        <h2>Withdraw Funds</h2>
+        <label for="withdrawAmt">Amount</label>
+        <input id="withdrawAmt" type="text" placeholder="Enter amount">
+        <button class="primary" onclick="doWithdraw()">Withdraw</button>
+        <div id="withdrawMsg" class="msg"></div>
+      </div>
+    </div>
 
-      <div className="card">
-        <h2>Recent Transactions</h2>
+    <!-- BENEFICIARY -->
+    <div id="page-beneficiary" class="page hidden">
+      <div class="card">
+        <h2>Add Beneficiary</h2>
+        <label for="benName">Name</label>
+        <input id="benName" type="text" placeholder="Full name">
+        <label for="benAcc">Account Number</label>
+        <input id="benAcc" type="text" placeholder="Account number">
+        <button class="primary" onclick="addBeneficiary()">Add Beneficiary</button>
+        <div id="benMsg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>Saved Beneficiaries</h2>
+        <div id="benList"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="page-history" class="page hidden">
+      <div class="card">
+        <h2>Transaction History</h2>
+        <label for="filterDate">Filter by date</label>
+        <input id="filterDate" type="date">
+        <button class="primary" onclick="filterHistory()">Filter</button>
         <table>
           <thead>
-            <tr><th>Date</th><th>Description</th><th>Status</th><th style={{textAlign:"right"}}>Amount</th></tr>
+            <tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr>
           </thead>
-          <tbody>
-            {recent.map((t) => (
-              <tr key={t.id}>
-                <td>{t.date}</td>
-                <td>{t.desc}</td>
-                <td>
-                  <span className={"pill " + (t.status === "Success" ? "pill-success" : t.status === "Pending" ? "pill-pending" : "pill-failed")}>
-                    {t.status}
-                  </span>
-                </td>
-                <td style={{ textAlign: "right" }} className={t.type === "credit" ? "amt-credit" : "amt-debit"}>
-                  {t.type === "credit" ? "+ " : "- "}{formatCurrency(t.amount)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          <tbody id="historyBody"></tbody>
         </table>
+        <div class="pagination">
+          <span onclick="prevPage()">&laquo; Prev</span>
+          <span id="pageIndicator">Page 1</span>
+          <span onclick="nextPage()">Next &raquo;</span>
+        </div>
       </div>
     </div>
-  );
+
+    <!-- PROFILE -->
+    <div id="page-profile" class="page hidden">
+      <div class="card">
+        <h2>Profile Settings</h2>
+        <label for="profEmail">Email</label>
+        <input id="profEmail" type="text" placeholder="you@example.com" value="admin@securebank.com">
+        <label for="profPhone">Phone</label>
+        <input id="profPhone" type="text" placeholder="Phone number" value="9876543210">
+        <button class="primary" onclick="updateProfile()">Save Changes</button>
+        <div id="profMsg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>Change Password</h2>
+        <label for="newPass">New Password</label>
+        <input id="newPass" type="password" placeholder="New password">
+        <label for="confirmPass">Confirm Password</label>
+        <input id="confirmPass" type="password" placeholder="Confirm password">
+        <button class="primary" onclick="changePassword()">Update Password</button>
+        <div id="passMsg" class="msg"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer">© 2023 SecureBank Online. All rights reserved.</div>
+</div>
+
+<script>
+/* ---------------- In-memory app state ---------------- */
+let balance = 50000;
+let username = "admin";
+let password = "admin123";
+let beneficiaries = [];
+let transactions = [
+  { date: "2026-06-01", desc: "Salary Credit", type: "credit", amount: 45000 },
+  { date: "2026-06-01", desc: "Electricity Bill", type: "debit", amount: 1800 }
+];
+let currentPage = 1;
+const pageSize = 5;
+let sessionActive = false;
+
+/* ---------------- Login ---------------- */
+function login() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  const msg = document.getElementById('loginMsg');
+
+  // BUG: password check is not validated against stored password strictly,
+  // and blank password is allowed if username matches.
+  if (u === username) {
+    sessionActive = true;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    showPage('dashboard');
+    renderAll();
+    return;
+  }
+  msg.textContent = "Invalid username or password";
+  msg.classList.add('show');
 }
 
-// ---------------- Transactions ----------------
-function TransactionsScreen({ transactions }) {
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("All");
+function logout() {
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = "";
+  document.getElementById('loginPass').value = "";
+  // BUG: sessionActive flag is never reset to false, so app state persists.
+}
 
-  // BUG #9: search is case-sensitive because no .toLowerCase() normalization
-  // BUG #7: "sort by date" toggle exists but doesn't actually change order
-  const [sortByDate, setSortByDate] = useState(false);
+/* ---------------- Navigation ---------------- */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.getElementById('page-' + name).classList.remove('hidden');
+  renderAll();
+}
 
-  const filtered = transactions.filter((t) => {
-    const matchesSearch = t.desc.includes(search); // case-sensitive on purpose (bug)
-    // BUG #8: "Credit" filter also lets Pending items through regardless of type
-    const matchesFilter =
-      filter === "All" ||
-      (filter === "Credit" && (t.type === "credit" || t.status === "Pending")) ||
-      (filter === "Debit" && t.type === "debit" && t.status !== "Pending");
-    return matchesSearch && matchesFilter;
+/* ---------------- Rendering ---------------- */
+function renderAll() {
+  document.getElementById('dashBalance').textContent = "$" + balance;
+  renderHistory();
+  renderBeneficiaries();
+}
+
+function renderBeneficiaries() {
+  const list = document.getElementById('benList');
+  if (!list) return;
+  list.innerHTML = "";
+  beneficiaries.forEach(b => {
+    const div = document.createElement('div');
+    div.className = "beneficiary-item";
+    div.innerHTML = `<span>${b.name}</span><span>${b.acc}</span>`;
+    list.appendChild(div);
   });
-
-  // sortByDate is toggled but never actually applied to `filtered` -> bug
-  const displayed = filtered;
-
-  return (
-    <div className="card">
-      <h2>All Transactions</h2>
-      <div className="form-row" style={{ marginBottom: 16 }}>
-        <div>
-          <label>Search description</label>
-          <input
-            type="text"
-            placeholder="e.g. Salary (try lowercase vs capitalized)"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Filter</label>
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option>All</option>
-            <option>Credit</option>
-            <option>Debit</option>
-          </select>
-        </div>
-      </div>
-      <button className="small-link" onClick={() => setSortByDate(!sortByDate)}>
-        {sortByDate ? "Sorted by date (newest first)" : "Sort by date"}
-      </button>
-      <div style={{ height: 12 }} />
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Description</th><th>Account</th><th>Status</th><th style={{textAlign:"right"}}>Amount</th></tr>
-        </thead>
-        <tbody>
-          {displayed.map((t) => (
-            <tr key={t.id}>
-              <td>{t.date}</td>
-              <td>{t.desc}</td>
-              <td>{t.account}</td>
-              <td>
-                <span className={"pill " + (t.status === "Success" ? "pill-success" : t.status === "Pending" ? "pill-pending" : "pill-failed")}>
-                  {t.status}
-                </span>
-              </td>
-              <td style={{ textAlign: "right" }} className={t.type === "credit" ? "amt-credit" : "amt-debit"}>
-                {t.type === "credit" ? "+ " : "- "}{formatCurrency(t.amount)}
-              </td>
-            </tr>
-          ))}
-          {displayed.length === 0 && (
-            <tr><td colSpan="5" style={{ textAlign: "center", color: "var(--ub-text-muted)", padding: 20 }}>No transactions found.</td></tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
 }
 
-// ---------------- Transfer Funds ----------------
-function TransferScreen({ accounts, setAccounts, addTransaction }) {
-  const [fromAcc, setFromAcc] = useState(accounts[0]?.id || "");
-  const [toAcc, setToAcc] = useState("Sakshi Sharma - XXXX-XXXX-2201");
-  const [amount, setAmount] = useState("");
-  const [remarks, setRemarks] = useState("");
-  const [message, setMessage] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+function renderHistory() {
+  const body = document.getElementById('historyBody');
+  if (!body) return;
+  body.innerHTML = "";
+  // BUG: pagination math slices wrong range (always shows first 5 regardless of currentPage)
+  const start = 0;
+  const end = pageSize;
+  const pageItems = transactions.slice(start, end);
+  pageItems.forEach(t => {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${t.date}</td><td>${t.desc}</td><td>${t.type}</td>
+      <td class="${t.type === 'credit' ? 'amt-credit' : 'amt-debit'}">
+      ${t.type === 'credit' ? '+' : '-'}$${t.amount}</td>`;
+    body.appendChild(row);
+  });
+  document.getElementById('pageIndicator').textContent = "Page " + currentPage;
+}
 
-  const recipients = [
-    "Sakshi Sharma - XXXX-XXXX-2201",
-    "Rahul Verma - XXXX-XXXX-3390",
-    "Priya Deshmukh - XXXX-XXXX-5567",
-  ];
+function nextPage() {
+  currentPage++;
+  renderHistory(); // BUG: renderHistory ignores currentPage, so nothing actually changes
+}
+function prevPage() {
+  if (currentPage > 1) currentPage--;
+  renderHistory();
+}
 
-  function handleTransfer(e) {
-    e.preventDefault();
-    // BUG #11: no check that amount <= account balance
-    // BUG #10: no check that amount > 0 (negative numbers silently accepted)
-    const amt = parseFloat(amount);
+function filterHistory() {
+  const val = document.getElementById('filterDate').value;
+  // BUG: filter reads the date field but never actually filters the transactions array
+  renderHistory();
+}
 
-    // BUG #14: no submitting guard actually blocks a second click because
-    // setSubmitting(true) happens AFTER the balance mutation below, not before.
-    const acc = accounts.find((a) => a.id === fromAcc);
-    if (!acc) return;
+/* ---------------- Transfer ---------------- */
+function doTransfer() {
+  const to = document.getElementById('transferTo').value;
+  const amt = parseFloat(document.getElementById('transferAmt').value);
+  const note = document.getElementById('transferNote').value;
+  const msg = document.getElementById('transferMsg');
 
-    const updated = accounts.map((a) =>
-      a.id === fromAcc ? { ...a, balance: a.balance - amt } : a
-    );
-    setAccounts(updated);
-    setSubmitting(true);
-
-    // BUG #13: shows recipients[index] using toAcc's position incorrectly (off-by-one)
-    const idx = recipients.indexOf(toAcc);
-    const shownRecipient = recipients[idx + 1] || recipients[idx];
-
-    // BUG #12: transaction record is never added to the transactions list
-    // (addTransaction is intentionally not called here)
-
-    setMessage({
-      type: "success",
-      text: `Transfer of ${formatCurrency(amt || 0)} to ${shownRecipient} was successful.`,
-    });
-    setSubmitting(false);
-    setAmount("");
-    setRemarks("");
+  // BUG: no validation for empty account number
+  // BUG: no validation preventing transfer amount greater than available balance
+  // BUG: no validation preventing negative or zero amounts
+  if (isNaN(amt)) {
+    msg.textContent = "Please enter a valid amount";
+    msg.className = "msg error show";
+    return;
   }
 
-  return (
-    <div className="card">
-      <h2>Transfer Funds</h2>
-      {message && <div className={message.type === "success" ? "success-msg" : "error-msg"}>{message.text}</div>}
-      <form onSubmit={handleTransfer}>
-        <div className="form-row">
-          <div>
-            <label>From Account</label>
-            <select value={fromAcc} onChange={(e) => setFromAcc(e.target.value)}>
-              {accounts.map((a) => (
-                <option key={a.id} value={a.id}>{a.type} - {a.number} ({formatCurrency(a.balance)})</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>To Recipient</label>
-            <select value={toAcc} onChange={(e) => setToAcc(e.target.value)}>
-              {recipients.map((r) => <option key={r} value={r}>{r}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="form-row">
-          <div>
-            <label>Amount (₹)</label>
-            <input
-              type="number"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Remarks (optional)</label>
-            <input
-              type="text"
-              placeholder="e.g. Rent, Loan repayment"
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-            />
-          </div>
-        </div>
-        <button type="submit" className="btn btn-gold">Transfer Now</button>
-      </form>
-    </div>
-  );
+  balance = balance - amt; // BUG: no check against balance, can go negative
+  // BUG: transaction is not pushed into the transactions array, so transfer never appears in history
+  msg.textContent = "Transfer of $" + amt + " to " + to + " successful!";
+  msg.className = "msg success show";
+  document.getElementById('dashBalance').textContent = "$" + balance;
 }
 
-// ---------------- Pay Bills ----------------
-function PayBillsScreen({ accounts, setAccounts }) {
-  const [biller, setBiller] = useState("Electricity Board");
-  const [accId, setAccId] = useState(accounts[0]?.id || "");
-  const [amount, setAmount] = useState("");
-  const [message, setMessage] = useState(null);
-
-  function handlePay(e) {
-    e.preventDefault();
-    // BUG #15: amount field has no numeric validation, "abc" becomes NaN
-    const amt = parseFloat(amount);
-
-    const updated = accounts.map((a) =>
-      a.id === accId ? { ...a, balance: a.balance - amt } : a
-    );
-    setAccounts(updated);
-
-    // BUG #16: success message shows regardless of whether amt is NaN or invalid
-    setMessage({ type: "success", text: `Payment of ₹${amount} to ${biller} was successful.` });
-    setAmount("");
+/* ---------------- Deposit / Withdraw ---------------- */
+function doDeposit() {
+  const amt = parseFloat(document.getElementById('depositAmt').value);
+  const msg = document.getElementById('depositMsg');
+  if (isNaN(amt) || amt <= 0) {
+    msg.textContent = "Enter a valid deposit amount";
+    msg.className = "msg error show";
+    return;
   }
-
-  return (
-    <div className="card">
-      <h2>Pay Bills</h2>
-      {message && <div className="success-msg">{message.text}</div>}
-      <form onSubmit={handlePay}>
-        <div className="form-row">
-          <div>
-            <label>Biller</label>
-            <select value={biller} onChange={(e) => setBiller(e.target.value)}>
-              <option>Electricity Board</option>
-              <option>Water Supply Dept</option>
-              <option>Broadband - Jio Fiber</option>
-              <option>Mobile Postpaid</option>
-            </select>
-          </div>
-          <div>
-            <label>Pay From</label>
-            <select value={accId} onChange={(e) => setAccId(e.target.value)}>
-              {accounts.map((a) => (
-                <option key={a.id} value={a.id}>{a.type} - {a.number}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <label>Amount (₹)</label>
-        {/* BUG #15: type="text" instead of type="number", so letters are allowed */}
-        <input
-          type="text"
-          placeholder="Enter amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <button type="submit" className="btn btn-gold" style={{ marginTop: 4 }}>Pay Now</button>
-      </form>
-    </div>
-  );
+  balance = balance - amt; // BUG: deposit should ADD to balance, this subtracts instead
+  transactions.unshift({ date: "2026-06-01", desc: "Deposit", type: "credit", amount: amt }); // BUG: date hardcoded, not current date
+  msg.textContent = "Deposited $" + amt + " successfully";
+  msg.className = "msg success show";
+  renderAll();
 }
 
-// ---------------- Profile ----------------
-function ProfileScreen({ user }) {
-  const [fullName, setFullName] = useState(user.fullName);
-  const [email, setEmail] = useState(user.email);
-  const [phone, setPhone] = useState("+91 98765 43210");
-  const [saved, setSaved] = useState(false);
-
-  function handleSave(e) {
-    e.preventDefault();
-    // BUG #17: values are only kept in local component state, never written back
-    // to any shared/user store or persisted -> "changes" vanish on tab switch.
-    // BUG #18: no email format validation at all before "saving"
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+function doWithdraw() {
+  const amt = parseFloat(document.getElementById('withdrawAmt').value);
+  const msg = document.getElementById('withdrawMsg');
+  if (isNaN(amt) || amt <= 0) {
+    msg.textContent = "Enter a valid withdrawal amount";
+    msg.className = "msg error show";
+    return;
   }
-
-  return (
-    <div className="card">
-      <h2>Profile Settings</h2>
-      {saved && <div className="success-msg">Profile updated.</div>}
-      <form onSubmit={handleSave}>
-        <div className="form-row">
-          <div>
-            <label>Full Name</label>
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div>
-            <label>Email Address</label>
-            <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-        </div>
-        <label>Phone Number</label>
-        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <button type="submit" className="btn btn-outline">Save Changes</button>
-      </form>
-    </div>
-  );
+  // BUG: no check whether amt > balance, allows withdrawing more than available balance
+  balance = balance + amt; // BUG: withdraw should SUBTRACT from balance, this adds instead
+  transactions.unshift({ date: "2026-06-01", desc: "Withdrawal", type: "debit", amount: amt });
+  msg.textContent = "Withdrew $" + amt + " successfully";
+  msg.className = "msg success show";
+  renderAll();
 }
 
-// ---------------- App Shell ----------------
-function AppShell({ onLogout }) {
-  const [tab, setTab] = useState("dashboard");
-  const [accounts, setAccounts] = useState(initialAccounts);
-  const [transactions, setTransactions] = useState(initialTransactions);
+/* ---------------- Beneficiary ---------------- */
+function addBeneficiary() {
+  const name = document.getElementById('benName').value;
+  const acc = document.getElementById('benAcc').value;
+  const msg = document.getElementById('benMsg');
 
-  function addTransaction(tx) {
-    setTransactions((prev) => [tx, ...prev]);
+  // BUG: no validation that account number is numeric
+  // BUG: no validation preventing duplicate beneficiary entries
+  if (name === "" && acc === "") {
+    msg.textContent = "Please fill all fields";
+    msg.className = "msg error show";
+    return;
   }
-
-  const tabs = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "transactions", label: "Transactions" },
-    { id: "transfer", label: "Transfer Funds" },
-    { id: "billpay", label: "Pay Bills" },
-    { id: "profile", label: "Profile" },
-  ];
-
-  return (
-    <div className="ub-app">
-      <div className="topbar">
-        <div className="topbar-left">
-          <div className="brand-mark">UB</div>
-          <div className="brand-name">UB BANK</div>
-        </div>
-        <div className="userbadge">
-          <div className="avatar">UP</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>{DEFAULT_USER.fullName}</div>
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Customer ID: UB2026458</div>
-          </div>
-          {/* BUG #19: onLogout does not clear any session-level state, dashboard data persists in memory */}
-          <button className="btn-outline" style={{ padding: "8px 14px", fontSize: 13, marginLeft: 14, width: "auto" }} onClick={onLogout}>
-            Logout
-          </button>
-        </div>
-      </div>
-
-      <div className="nav">
-        {tabs.map((t) => (
-          <button key={t.id} className={tab === t.id ? "active" : ""} onClick={() => setTab(t.id)}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="main">
-        {tab === "dashboard" && <Dashboard accounts={accounts} transactions={transactions} />}
-        {tab === "transactions" && <TransactionsScreen transactions={transactions} />}
-        {tab === "transfer" && <TransferScreen accounts={accounts} setAccounts={setAccounts} addTransaction={addTransaction} />}
-        {tab === "billpay" && <PayBillsScreen accounts={accounts} setAccounts={setAccounts} />}
-        {tab === "profile" && <ProfileScreen user={DEFAULT_USER} />}
-      </div>
-
-      <div className="footer-note">UB Bank Manual Testing Sandbox &mdash; for QA training and practice only. Not a real bank.</div>
-    </div>
-  );
+  beneficiaries.push({ name: name, acc: acc });
+  msg.textContent = "Beneficiary added successfully";
+  msg.className = "msg success show";
+  // BUG: input fields are not cleared after successful add
+  // renderBeneficiaries() is not called here, so the list appears stale until switching pages
 }
 
-function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  return loggedIn ? <AppShell onLogout={() => setLoggedIn(false)} /> : <LoginScreen onLogin={() => setLoggedIn(true)} />;
+/* ---------------- Profile ---------------- */
+function updateProfile() {
+  const email = document.getElementById('profEmail').value;
+  const phone = document.getElementById('profPhone').value;
+  const msg = document.getElementById('profMsg');
+  // BUG: no email format validation (accepts any string, e.g. "abc")
+  // BUG: no phone number numeric/length validation (accepts letters)
+  msg.textContent = "Profile updated successfully";
+  msg.className = "msg success show";
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+function changePassword() {
+  const p1 = document.getElementById('newPass').value;
+  const p2 = document.getElementById('confirmPass').value;
+  const msg = document.getElementById('passMsg');
+  // BUG: does not check p1 === p2 (confirm password mismatch is never caught)
+  // BUG: does not enforce minimum password length
+  if (p1 === "") {
+    msg.textContent = "Password updated successfully"; // BUG: shows success even though field was empty
+    msg.className = "msg success show";
+    return;
+  }
+  password = p1;
+  msg.textContent = "Password updated successfully";
+  msg.className = "msg success show";
+}
 </script>
+
 </body>
 </html>
